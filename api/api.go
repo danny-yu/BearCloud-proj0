@@ -91,8 +91,7 @@ func getJSON(response http.ResponseWriter, request *http.Request) {
 		
 		Make sure to error check! If there are any errors, call http.Error(), and pass in a "http.StatusBadRequest" What kind of errors can we expect here?
 	*/
-
-	/*YOUR CODE HERE*/
+	/*YOUR CODE HERE*/ 
 
 	cred := Credentials{}
 	jsonDecoder := json.NewDecoder(request.Body)
