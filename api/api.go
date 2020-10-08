@@ -1,8 +1,11 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"github.com/gorilla/mux"
+	"encoding/json"
+	"strconv"
 )
 
 
@@ -10,7 +13,7 @@ import (
 //See credentials.go
 
 /*YOUR CODE HERE*/
-
+var credentials_arr []Credentials = []Credentials{}
 
 
 func RegisterRoutes(router *mux.Router) error {
@@ -46,6 +49,13 @@ func getCookie(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+	cookie, err := request.Cookie("access_token")
+	if err != nil {
+		fmt.Fprintln(response, "")
+		return
+	}
+	accessToken := cookie.Value
+	fmt.Fprintln(response, accessToken)
 }
 
 func getQuery(response http.ResponseWriter, request *http.Request) {
@@ -56,6 +66,13 @@ func getQuery(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+	userID := request.URL.Query().Get("userID")
+	if userID == "" {
+		fmt.Fprintln(response, "")
+		return
+	}
+	fmt.Fprintln(response, userID)
+
 }
 
 func getJSON(response http.ResponseWriter, request *http.Request) {
@@ -76,6 +93,15 @@ func getJSON(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+
+	cred := Credentials{}
+	jsonDecoder := json.NewDecoder(request.Body)
+	err := jsonDecoder.Decode(&cred)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	fmt.Fprintln(response, strconv.Itoa(cred.Username)+"\n"+strconv.Itoa(cred.Password))
 	
 }
 
