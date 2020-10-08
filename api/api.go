@@ -51,11 +51,11 @@ func getCookie(response http.ResponseWriter, request *http.Request) {
 	/*YOUR CODE HERE*/
 	cookie, err := request.Cookie("access_token")
 	if err != nil {
-		fmt.Fprintln(response, "")
+		fmt.Fprintf(response, "")
 		return
 	}
 	accessToken := cookie.Value
-	fmt.Fprintln(response, accessToken)
+	fmt.Fprintf(response, accessToken)
 }
 
 func getQuery(response http.ResponseWriter, request *http.Request) {
@@ -68,10 +68,10 @@ func getQuery(response http.ResponseWriter, request *http.Request) {
 	/*YOUR CODE HERE*/
 	userID := request.URL.Query().Get("userID")
 	if userID == "" {
-		fmt.Fprintln(response, "")
+		fmt.Fprintf(response, "")
 		return
 	}
-	fmt.Fprintln(response, userID)
+	fmt.Fprintf(response, userID)
 
 }
 
@@ -101,7 +101,7 @@ func getJSON(response http.ResponseWriter, request *http.Request) {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Fprintln(response, cred.Username+"\n"+cred.Password)
+	fmt.Fprintf(response, cred.Username+"\n"+cred.Password)
 	
 }
 
