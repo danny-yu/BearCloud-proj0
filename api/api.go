@@ -3,9 +3,10 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"errors"
 	"github.com/gorilla/mux"
 	"encoding/json"
-	_"strconv"
+	"strconv"
 )
 
 
@@ -13,7 +14,7 @@ import (
 //See credentials.go
 
 /*YOUR CODE HERE*/
-var credentials_arr []Credentials = []Credentials{}
+var users []Credentials = []Credentials{}
 
 
 func RegisterRoutes(router *mux.Router) error {
@@ -97,7 +98,11 @@ func getJSON(response http.ResponseWriter, request *http.Request) {
 	jsonDecoder := json.NewDecoder(request.Body)
 	err := jsonDecoder.Decode(&cred)
 	if err != nil {
-		http.Error(response, "400", http.StatusBadRequest)
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if cred.Username == "" || cred.Password == "" {
+		http.Error(response, errors.New("Bad Credentials").Error(), http.StatusBadRequest)
 		return
 	}
 	fmt.Fprintf(response, cred.Username+"\n"+cred.Password)
@@ -122,6 +127,22 @@ func signup(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+	cred := Credentials{}
+	jsonDecoder := json.NewDecoder(request.Body)
+	err := jsonDecoder.Decode(&cred)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if cred.Username == "" || cred.Password == "" {
+		http.Error(response, errors.New("Bad Credentials").Error(), http.StatusBadRequest)
+		return
+	}
+
+	users = append(users, cred)
+
+	response.WriteHeader(201)
+	return
 }
 
 func getIndex(response http.ResponseWriter, request *http.Request) {
@@ -144,6 +165,27 @@ func getIndex(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+	cred := Credentials{}
+	jsonDecoder := json.NewDecoder(request.Body)
+	err := jsonDecoder.Decode(&cred)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if cred.Username == "" {
+		http.Error(response, errors.New("Bad Credentials").Error(), http.StatusBadRequest)
+		return
+	}
+
+	for i := 0; i < len(users); i++ {
+		if users[i].Username == cred.Username{
+			fmt.Fprintf(response, strconv.Itoa(i))
+			return
+		}
+	}
+
+	http.Error(response, errors.New("user not found").Error(), http.StatusBadRequest)
+	return
 }
 
 func getPassword(response http.ResponseWriter, request *http.Request) {
@@ -164,6 +206,26 @@ func getPassword(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+	cred := Credentials{}
+	jsonDecoder := json.NewDecoder(request.Body)
+	err := jsonDecoder.Decode(&cred)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if cred.Username == "" {
+		http.Error(response, errors.New("Bad Credentials").Error(), http.StatusBadRequest)
+		return
+	}
+	for i:=0; i < len(users); i++ {
+		if users[i].Username == cred.Username{
+			fmt.Fprintf(response, users[i].Password)
+			return
+		}
+	}
+
+	http.Error(response, errors.New("user not found").Error(), http.StatusBadRequest)
+	return
 }
 
 
@@ -189,6 +251,26 @@ func updatePassword(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+	cred := Credentials{}
+	jsonDecoder := json.NewDecoder(request.Body)
+	err := jsonDecoder.Decode(&cred)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if cred.Username == "" || cred.Password == ""{
+		http.Error(response, errors.New("Bad Credentials").Error(), http.StatusBadRequest)
+		return
+	}
+	for i:=0; i < len(users); i++ {
+		if users[i].Username == cred.Username {
+			users[i].Password = cred.Password
+			return
+		}
+	}
+
+	http.Error(response, errors.New("user not found").Error(), http.StatusBadRequest)
+	return
 }
 
 func deleteUser(response http.ResponseWriter, request *http.Request) {
@@ -214,4 +296,28 @@ func deleteUser(response http.ResponseWriter, request *http.Request) {
 	*/
 
 	/*YOUR CODE HERE*/
+		cred := Credentials{}
+	jsonDecoder := json.NewDecoder(request.Body)
+	err := jsonDecoder.Decode(&cred)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if cred.Username == "" || cred.Password == ""{
+		http.Error(response, errors.New("Bad Credentials").Error(), http.StatusBadRequest)
+		return
+	}
+	for i:=0; i < len(users); i++ {
+		if users[i].Username == cred.Username && users[i].Password == cred.Password{
+			users = remove(users, i)
+			return
+		}
+	}
+
+	http.Error(response, errors.New("user not found").Error(), http.StatusBadRequest)
+	return
+}
+
+func remove(slice []Credentials, s int) []Credentials {
+    return append(slice[:s], slice[s+1:]...)
 }
